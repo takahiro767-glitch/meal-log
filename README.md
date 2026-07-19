@@ -1,0 +1,595 @@
+[index.html.html](https://github.com/user-attachments/files/30160007/index.html.html)
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="食事出費帳">
+<title>食事出費帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F4EC;
+    --paper-line:#E4DFD0;
+    --card:#FFFDF8;
+    --ink:#262220;
+    --ink-soft:#726B62;
+    --stamp:#B23A2E;
+    --sage:#5F7A63;
+    --gold:#B8952E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 2.2em;
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    min-height:100vh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    padding:20px 18px 48px;
+  }
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 0 18px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:22px;
+  }
+  header button{
+    background:none;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    width:36px; height:36px;
+    border-radius:50%;
+    font-size:18px;
+    line-height:1;
+    cursor:pointer;
+  }
+  header button:active{background:var(--ink); color:var(--paper);}
+  .date-display{text-align:center;}
+  .date-main{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:.04em;
+  }
+  .date-sub{
+    font-size:12px;
+    color:var(--ink-soft);
+    letter-spacing:.1em;
+    margin-top:2px;
+  }
+  .meal-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-left:4px solid var(--sage);
+    border-radius:2px;
+    padding:16px 16px 14px;
+    margin-bottom:14px;
+    box-shadow:0 1px 0 rgba(0,0,0,.03);
+  }
+  .meal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:10px;
+  }
+  .meal-label{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:16px;
+    letter-spacing:.08em;
+  }
+  .meal-status{
+    font-size:11px;
+    color:var(--sage);
+    letter-spacing:.05em;
+    opacity:0;
+    transition:opacity .25s;
+  }
+  .meal-status.on{opacity:1;}
+  .meal-content{
+    width:100%;
+    border:none;
+    border-bottom:1px solid var(--paper-line);
+    background:transparent;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    padding:6px 2px 8px;
+    resize:none;
+    height:40px;
+  }
+  .meal-content:focus{outline:none; border-bottom-color:var(--ink);}
+  .meal-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:10px;
+  }
+  .expense-field{
+    display:flex;
+    align-items:baseline;
+    gap:4px;
+  }
+  .expense-field .yen{font-size:13px; color:var(--ink-soft);}
+  .expense-field input{
+    width:88px;
+    border:none;
+    border-bottom:1px solid var(--paper-line);
+    background:transparent;
+    font-family:'JetBrains Mono', monospace;
+    font-size:15px;
+    color:var(--stamp);
+    padding:4px 2px;
+    text-align:right;
+  }
+  .expense-field input:focus{outline:none; border-bottom-color:var(--stamp);}
+  .save-btn{
+    background:none;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    font-size:12px;
+    letter-spacing:.1em;
+    padding:6px 14px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+  .save-btn:active{background:var(--ink); color:var(--paper);}
+  .total-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 4px;
+    border-top:2px solid var(--ink);
+    margin-top:6px;
+    font-family:'Shippori Mincho', serif;
+  }
+  .total-bar span:first-child{font-size:14px; letter-spacing:.1em;}
+  .total-bar span:last-child{
+    font-family:'JetBrains Mono', monospace;
+    font-size:20px;
+    color:var(--stamp);
+    font-weight:500;
+  }
+  .snack-section{margin-bottom:14px;}
+  .snack-section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:8px;
+  }
+  .snack-section-head .meal-label{border-left:4px solid var(--gold); padding-left:10px;}
+  .add-snack-btn{
+    background:none;
+    border:1px solid var(--gold);
+    color:var(--gold);
+    font-size:12px;
+    letter-spacing:.05em;
+    padding:5px 12px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+  .add-snack-btn:active{background:var(--gold); color:var(--paper);}
+  .snack-row{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-left:4px solid var(--gold);
+    border-radius:2px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .snack-row input.snack-content{
+    flex:1;
+    min-width:0;
+    border:none;
+    border-bottom:1px solid var(--paper-line);
+    background:transparent;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    padding:4px 2px;
+  }
+  .snack-row input.snack-content:focus{outline:none; border-bottom-color:var(--ink);}
+  .snack-row .snack-expense-field{display:flex; align-items:baseline; gap:3px; flex-shrink:0;}
+  .snack-row .snack-expense-field .yen{font-size:12px; color:var(--ink-soft);}
+  .snack-row input.snack-expense{
+    width:64px;
+    border:none;
+    border-bottom:1px solid var(--paper-line);
+    background:transparent;
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    color:var(--stamp);
+    padding:4px 2px;
+    text-align:right;
+  }
+  .snack-row input.snack-expense:focus{outline:none; border-bottom-color:var(--stamp);}
+  .snack-row .snack-remove{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:18px;
+    line-height:1;
+    cursor:pointer;
+    flex-shrink:0;
+    padding:2px 4px;
+  }
+  .snack-empty{color:var(--ink-soft); font-size:13px; padding:4px 2px 8px;}
+  .history-toggle{
+    display:block;
+    margin:22px auto 0;
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13px;
+    letter-spacing:.1em;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    cursor:pointer;
+  }
+  .history{margin-top:18px;}
+  .history-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 4px;
+    border-bottom:1px solid var(--paper-line);
+    font-size:14px;
+    cursor:pointer;
+  }
+  .history-row .h-date{color:var(--ink);}
+  .history-row .h-meals{color:var(--ink-soft); font-size:12px; margin-left:8px;}
+  .history-row .h-total{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--stamp);
+  }
+  .history-empty{color:var(--ink-soft); font-size:13px; padding:12px 4px;}
+  .stamp-overlay{
+    position:fixed;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%) scale(.6) rotate(-8deg);
+    width:120px; height:120px;
+    border:5px solid var(--stamp);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Shippori Mincho', serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--stamp);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s, transform .2s;
+    background:rgba(247,244,236,.85);
+  }
+  .stamp-overlay.show{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1) rotate(-8deg);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <button id="prevDay" aria-label="前日">‹</button>
+    <div class="date-display">
+      <div class="date-main" id="dateMain"></div>
+      <div class="date-sub" id="dateSub"></div>
+    </div>
+    <button id="nextDay" aria-label="翌日">›</button>
+  </header>
+
+  <section class="meals" id="mealsContainer"></section>
+
+  <section class="snack-section">
+    <div class="snack-section-head">
+      <span class="meal-label">間食・購入品</span>
+      <button class="add-snack-btn" id="addSnackBtn">＋ 追加</button>
+    </div>
+    <div id="snacksContainer"></div>
+  </section>
+
+  <div class="total-bar">
+    <span>本日合計</span>
+    <span id="dailyTotal">¥0</span>
+  </div>
+
+  <button class="history-toggle" id="historyToggle">履歴を見る</button>
+
+  <section class="history" id="historyView" hidden>
+    <div id="historyList"></div>
+  </section>
+
+</div>
+
+<div class="stamp-overlay" id="stampOverlay">記録済</div>
+
+<script>
+const MEAL_TYPES = [
+  {key:'breakfast', label:'朝食'},
+  {key:'lunch', label:'昼食'},
+  {key:'dinner', label:'夕食'}
+];
+
+let currentDate = new Date();
+let currentData = null;
+
+function fmtKey(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function fmtDisplay(d){
+  const wd = ['日','月','火','水','木','金','土'][d.getDay()];
+  return {
+    main: `${d.getMonth()+1}月${d.getDate()}日`,
+    sub: `${d.getFullYear()} / ${wd}曜日`
+  };
+}
+function emptyDay(){
+  const o={snacks:[]};
+  MEAL_TYPES.forEach(m=>o[m.key]={content:'', expense:0});
+  return o;
+}
+
+async function loadDay(d){
+  const key = 'meal-log:' + fmtKey(d);
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return emptyDay();
+    const data = JSON.parse(raw);
+    if(!Array.isArray(data.snacks)) data.snacks = [];
+    return data;
+  }catch(e){
+    return emptyDay();
+  }
+}
+async function saveDay(d, data){
+  const key = 'meal-log:' + fmtKey(d);
+  try{
+    localStorage.setItem(key, JSON.stringify(data));
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function renderHeader(){
+  const disp = fmtDisplay(currentDate);
+  document.getElementById('dateMain').textContent = disp.main;
+  document.getElementById('dateSub').textContent = disp.sub;
+}
+
+function renderMeals(){
+  const container = document.getElementById('mealsContainer');
+  container.innerHTML = '';
+  MEAL_TYPES.forEach(meal=>{
+    const entry = currentData[meal.key] || {content:'', expense:0};
+    const card = document.createElement('div');
+    card.className = 'meal-card';
+    card.innerHTML = `
+      <div class="meal-head">
+        <span class="meal-label">${meal.label}</span>
+        <span class="meal-status" id="status-${meal.key}">記録済</span>
+      </div>
+      <textarea class="meal-content" id="content-${meal.key}" placeholder="食べたものを記録">${entry.content || ''}</textarea>
+      <div class="meal-foot">
+        <div class="expense-field">
+          <span class="yen">¥</span>
+          <input type="number" inputmode="numeric" id="expense-${meal.key}" value="${entry.expense || ''}" placeholder="0">
+        </div>
+        <button class="save-btn" data-meal="${meal.key}">記録する</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  container.querySelectorAll('.save-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>saveMeal(btn.dataset.meal));
+  });
+
+  updateTotal();
+}
+
+function updateTotal(){
+  let total = 0;
+  MEAL_TYPES.forEach(m=>{
+    total += Number(currentData[m.key]?.expense || 0);
+  });
+  (currentData.snacks || []).forEach(s=>{
+    total += Number(s.expense || 0);
+  });
+  document.getElementById('dailyTotal').textContent = '¥' + total.toLocaleString();
+}
+
+function renderSnacks(){
+  const container = document.getElementById('snacksContainer');
+  const snacks = currentData.snacks || [];
+  if(snacks.length === 0){
+    container.innerHTML = '<div class="snack-empty">コーヒー、コンビニのパンなど、食事以外の購入を記録できます</div>';
+    updateTotal();
+    return;
+  }
+  container.innerHTML = snacks.map((s, i)=>`
+    <div class="snack-row" data-idx="${i}">
+      <input type="text" class="snack-content" placeholder="購入したもの" value="${(s.content||'').replace(/"/g,'&quot;')}">
+      <div class="snack-expense-field">
+        <span class="yen">¥</span>
+        <input type="number" inputmode="numeric" class="snack-expense" placeholder="0" value="${s.expense || ''}">
+      </div>
+      <button class="snack-remove" aria-label="削除">×</button>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.snack-row').forEach(row=>{
+    const idx = Number(row.dataset.idx);
+    const contentInput = row.querySelector('.snack-content');
+    const expenseInput = row.querySelector('.snack-expense');
+    const removeBtn = row.querySelector('.snack-remove');
+
+    contentInput.addEventListener('change', ()=>persistSnack(idx, contentInput.value, expenseInput.value));
+    expenseInput.addEventListener('change', ()=>persistSnack(idx, contentInput.value, expenseInput.value));
+    removeBtn.addEventListener('click', ()=>removeSnack(idx));
+  });
+
+  updateTotal();
+}
+
+async function persistSnack(idx, content, expense){
+  currentData.snacks[idx] = {content, expense: Number(expense || 0)};
+  const ok = await saveDay(currentDate, currentData);
+  updateTotal();
+  if(ok) showStamp();
+}
+
+async function removeSnack(idx){
+  currentData.snacks.splice(idx, 1);
+  await saveDay(currentDate, currentData);
+  renderSnacks();
+}
+
+document.getElementById('addSnackBtn').addEventListener('click', ()=>{
+  currentData.snacks = currentData.snacks || [];
+  currentData.snacks.push({content:'', expense:0});
+  renderSnacks();
+  const rows = document.querySelectorAll('.snack-row');
+  const last = rows[rows.length-1];
+  if(last) last.querySelector('.snack-content').focus();
+});
+
+async function saveMeal(key){
+  const content = document.getElementById(`content-${key}`).value;
+  const expense = Number(document.getElementById(`expense-${key}`).value || 0);
+  currentData[key] = {content, expense};
+  const ok = await saveDay(currentDate, currentData);
+  updateTotal();
+  if(ok){
+    const status = document.getElementById(`status-${key}`);
+    status.classList.add('on');
+    setTimeout(()=>status.classList.remove('on'), 1600);
+    showStamp();
+  }
+}
+
+function showStamp(){
+  const overlay = document.getElementById('stampOverlay');
+  overlay.classList.add('show');
+  setTimeout(()=>overlay.classList.remove('show'), 550);
+}
+
+async function goToDate(d){
+  currentDate = d;
+  currentData = await loadDay(currentDate);
+  renderHeader();
+  renderMeals();
+  renderSnacks();
+}
+
+document.getElementById('prevDay').addEventListener('click', ()=>{
+  const d = new Date(currentDate);
+  d.setDate(d.getDate()-1);
+  goToDate(d);
+});
+document.getElementById('nextDay').addEventListener('click', ()=>{
+  const d = new Date(currentDate);
+  d.setDate(d.getDate()+1);
+  goToDate(d);
+});
+
+const historyToggle = document.getElementById('historyToggle');
+const historyView = document.getElementById('historyView');
+historyToggle.addEventListener('click', async ()=>{
+  const hidden = historyView.hasAttribute('hidden');
+  if(hidden){
+    await renderHistory();
+    historyView.removeAttribute('hidden');
+    historyToggle.textContent = '履歴を閉じる';
+  }else{
+    historyView.setAttribute('hidden','');
+    historyToggle.textContent = '履歴を見る';
+  }
+});
+
+async function renderHistory(){
+  const listEl = document.getElementById('historyList');
+  listEl.innerHTML = '<div class="history-empty">読み込み中…</div>';
+  try{
+    const keys = [];
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.startsWith('meal-log:')) keys.push(k);
+    }
+    if(keys.length === 0){
+      listEl.innerHTML = '<div class="history-empty">記録がありません</div>';
+      return;
+    }
+    const sorted = keys.slice().sort().reverse().slice(0, 30);
+    const rows = [];
+    for(const k of sorted){
+      try{
+        const raw = localStorage.getItem(k);
+        if(!raw) continue;
+        const data = JSON.parse(raw);
+        const dateStr = k.replace('meal-log:', '');
+        let total = 0;
+        const eaten = [];
+        MEAL_TYPES.forEach(m=>{
+          const e = data[m.key];
+          if(e){
+            total += Number(e.expense || 0);
+            if(e.content) eaten.push(m.label);
+          }
+        });
+        const snackList = Array.isArray(data.snacks) ? data.snacks : [];
+        if(snackList.length) eaten.push(`間食${snackList.length}件`);
+        snackList.forEach(s=>{ total += Number(s.expense || 0); });
+        rows.push({dateStr, total, eaten});
+      }catch(e){ /* skip unreadable entry */ }
+    }
+    if(rows.length === 0){
+      listEl.innerHTML = '<div class="history-empty">記録がありません</div>';
+      return;
+    }
+    listEl.innerHTML = rows.map(r=>`
+      <div class="history-row" data-date="${r.dateStr}">
+        <span>
+          <span class="h-date">${r.dateStr}</span>
+          <span class="h-meals">${r.eaten.length ? r.eaten.join('・') : '未記録'}</span>
+        </span>
+        <span class="h-total">¥${r.total.toLocaleString()}</span>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.history-row').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        const [y,m,d] = row.dataset.date.split('-').map(Number);
+        goToDate(new Date(y, m-1, d));
+        historyView.setAttribute('hidden','');
+        historyToggle.textContent = '履歴を見る';
+      });
+    });
+  }catch(e){
+    listEl.innerHTML = '<div class="history-empty">読み込みに失敗しました</div>';
+  }
+}
+
+goToDate(new Date());
+</script>
+</body>
+</html>
